@@ -1,0 +1,22 @@
+logging:
+  file:
+    path: ./logs
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: webdiet-authorization-service
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/webdiet-auth
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
