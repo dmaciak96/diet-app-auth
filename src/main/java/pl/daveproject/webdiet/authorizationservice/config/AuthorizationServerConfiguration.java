@@ -6,10 +6,11 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -21,8 +22,11 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -32,21 +36,38 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 @Configuration
-@Import(OAuth2AuthorizationServerConfiguration.class)
+@EnableWebSecurity
 public class AuthorizationServerConfiguration {
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http,
-                                                             AuthorizationServerSettings authorizationServerSettings,
-                                                             RegisteredClientRepository registeredClientRepository) throws Exception {
-        var authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-        authorizationServerConfigurer.setBuilder(http);
-        authorizationServerConfigurer
-                .registeredClientRepository(registeredClientRepository)
-                .authorizationServerSettings(authorizationServerSettings);
+    @Order(1)
+    public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                .oidc(Customizer.withDefaults());
+        http
+                .exceptionHandling((exceptions) -> exceptions
+                        .defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        )
+                )
+                .oauth2ResourceServer((resourceServer) -> resourceServer
+                        .jwt(Customizer.withDefaults()));
 
-        http.apply(authorizationServerConfigurer);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
+            throws Exception {
+        http
+                .authorizeHttpRequests((authorize) -> authorize
+                        .anyRequest().authenticated()
+                )
+                .formLogin(Customizer.withDefaults());
+
         return http.build();
     }
 
@@ -59,7 +80,8 @@ public class AuthorizationServerConfiguration {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/webdiet-client-oidc")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/authorized")
+                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .build();
@@ -104,6 +126,4 @@ public class AuthorizationServerConfiguration {
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
-
-
 }
