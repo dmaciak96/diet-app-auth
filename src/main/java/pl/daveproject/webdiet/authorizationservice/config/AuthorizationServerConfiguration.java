@@ -4,14 +4,15 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -23,7 +24,6 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -37,6 +37,7 @@ import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class AuthorizationServerConfiguration {
 
     private static final String LOGIN_URL = "/login";
@@ -46,8 +47,8 @@ public class AuthorizationServerConfiguration {
     private static final String POST_LOGOUT_REDIRECT_URI = "http://127.0.0.1:8080/";
     private static final String ISSUSER_URI = "http://auth-server:8888";
     private static final String RSA_ALGORITHM_NAME = "RSA";
-    private static final String USERNAME = "admin";
-    private static final String PASSWORD = "{noop}admin";
+
+    private final UserDetailsService userDetailsService;
 
     @Bean
     @Order(1)
@@ -129,11 +130,9 @@ public class AuthorizationServerConfiguration {
     }
 
     @Bean
-    public UserDetailsService users() {
-        var user = User.builder()
-                .username(USERNAME)
-                .password(PASSWORD)
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public DaoAuthenticationProvider authProvider() {
+        var authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        return authenticationProvider;
     }
 }
