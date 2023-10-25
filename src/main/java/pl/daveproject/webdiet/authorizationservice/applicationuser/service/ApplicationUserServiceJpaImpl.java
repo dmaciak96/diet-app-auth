@@ -2,6 +2,7 @@ package pl.daveproject.webdiet.authorizationservice.applicationuser.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.daveproject.webdiet.authorizationservice.applicationuser.exception.UserAlreadyExistsException;
 import pl.daveproject.webdiet.authorizationservice.applicationuser.model.ApplicationUser;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ApplicationUserServiceJpaImpl implements ApplicationUserService {
+    private static final String BCRYPT_PREFIX = "{bcrypt}";
 
     private final ApplicationUserRepository applicationUserRepository;
 
@@ -24,7 +26,7 @@ public class ApplicationUserServiceJpaImpl implements ApplicationUserService {
         if (existsByUsername(applicationUser.getUsername())) {
             throw new UserAlreadyExistsException(applicationUser.getUsername());
         }
-        applicationUser.setPassword("{noop}" + applicationUser.getPassword());
+        applicationUser.setPassword(BCRYPT_PREFIX + encodePassword(applicationUser.getPassword()));
         applicationUser.setId(UUID.randomUUID());
         applicationUser.setAuthorities(List.of(Authority.builder()
                 .role(Role.USER)
@@ -33,6 +35,10 @@ public class ApplicationUserServiceJpaImpl implements ApplicationUserService {
                 .build()));
         applicationUser.setEnabled(true);
         return applicationUserRepository.save(applicationUser);
+    }
+
+    private String encodePassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 
     @Override
