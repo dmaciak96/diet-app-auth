@@ -39,6 +39,16 @@ import java.util.UUID;
 @EnableWebSecurity
 public class AuthorizationServerConfiguration {
 
+    private static final String LOGIN_URL = "/login";
+    private static final String CLIENT_ID = "webdiet-client";
+    private static final String CLIENT_SECRET = "{noop}webdiet-secret";
+    private static final String REDIRECT_URI = "http://127.0.0.1:8080/login/oauth2/code/webdiet-client-oidc";
+    private static final String POST_LOGOUT_REDIRECT_URI = "http://127.0.0.1:8080/";
+    private static final String ISSUSER_URI = "http://auth-server:8888";
+    private static final String RSA_ALGORITHM_NAME = "RSA";
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "{noop}admin";
+
     @Bean
     @Order(1)
     public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -48,7 +58,7 @@ public class AuthorizationServerConfiguration {
         http
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new LoginUrlAuthenticationEntryPoint(LOGIN_URL),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 )
@@ -74,13 +84,13 @@ public class AuthorizationServerConfiguration {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         var registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("webdiet-client")
-                .clientSecret("{noop}webdiet-secret")
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/webdiet-client-oidc")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+                .redirectUri(REDIRECT_URI)
+                .postLogoutRedirectUri(POST_LOGOUT_REDIRECT_URI)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
@@ -106,7 +116,7 @@ public class AuthorizationServerConfiguration {
     }
 
     private static KeyPair generateRsaKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(RSA_ALGORITHM_NAME);
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
@@ -114,15 +124,15 @@ public class AuthorizationServerConfiguration {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("http://auth-server:8888")
+                .issuer(ISSUSER_URI)
                 .build();
     }
 
     @Bean
     public UserDetailsService users() {
         var user = User.builder()
-                .username("admin")
-                .password("{noop}admin")
+                .username(USERNAME)
+                .password(PASSWORD)
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
