@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Rejestracja</title>
+    <title th:text="#{sign-up-page.title}"></title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -13,9 +13,10 @@
         <section class="col-12 col-sm-6 col-md-4">
             <form class="form-container" th:action="@{/sign-up}" method="post"
                   th:object="${applicationUserSignUpRequest}">
-                <h4 class="text-center font-weight-bold">Rejestracja</h4>
+                <h4 class="text-center font-weight-bold" th:text="#{sign-up-page.title}"></h4>
                 <div class="mb-3">
-                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Adres e-mail"
+                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                           th:placeholder="#{sign-up-page.email}"
                            required>
                     <label for="email"></label>
                     <ul>
@@ -25,7 +26,7 @@
                 </div>
                 <div class="mb-3">
                     <input type="text" class="form-control" id="username" th:field="*{username}"
-                           placeholder="Nazwa użytkownika" required>
+                           th:placeholder="#{sign-up-page.username}" required>
                     <label for="username"></label>
                     <ul>
                         <li th:each="errorMessage : ${#fields.errors('username')}" th:text="${errorMessage}"
@@ -33,7 +34,8 @@
                     </ul>
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="first-name" th:field="*{firstName}" placeholder="Imię"
+                    <input type="text" class="form-control" id="first-name" th:field="*{firstName}"
+                           th:placeholder="#{sign-up-page.first-name}"
                            required>
                     <label for="first-name"></label>
                     <ul>
@@ -43,7 +45,7 @@
                 </div>
                 <div class="mb-3">
                     <input type="text" class="form-control" id="last-name" th:field="*{lastName}"
-                           placeholder="Nazwisko" required>
+                           th:placeholder="#{sign-up-page.last-name}" required>
                     <label for="last-name"></label>
                     <ul>
                         <li th:each="errorMessage : ${#fields.errors('lastName')}" th:text="${errorMessage}"
@@ -52,7 +54,7 @@
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" id="password" th:field="*{password}"
-                           placeholder="Hasło" required>
+                           th:placeholder="#{sign-up-page.password}" required>
                     <label for="password"></label>
                     <ul>
                         <li th:each="errorMessage : ${#fields.errors('password')}" th:text="${errorMessage}"
@@ -61,16 +63,17 @@
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" id="confirm-password" th:field="*{confirmPassword}"
-                           placeholder="Powtórz hasło" required>
+                           th:placeholder="#{sign-up-page.confirm-password}" required>
                     <label for="confirm-password"></label>
                     <ul>
                         <li th:each="errorMessage : ${#fields.errors('confirmPassword')}" th:text="${errorMessage}"
                             class="text-danger"/>
                     </ul>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Zarejestruj się</button>
+                <button type="submit" class="btn btn-primary btn-block" th:text="#{sign-up-page.register}"></button>
                 <div class="form-footer">
-                    <p> Posiadasz konto? <a th:href="@{/login}">Zaloguj się</a></p>
+                    <p><span th:text="#{sign-up-page.question}"></span> <a th:href="@{/login}"
+                                                                           th:text="#{sign-up-page.login}"></a></p>
                 </div>
             </form>
         </section>

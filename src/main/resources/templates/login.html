@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Logowanie</title>
+    <title th:text="#{login-page.title}"></title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -12,18 +12,21 @@
     <section class="row justify-content-center">
         <section class="col-12 col-sm-6 col-md-4">
             <form class="form-container" th:action="@{/login}" method="post">
-                <h4 class="text-center font-weight-bold">Logowanie</h4>
+                <h4 class="text-center font-weight-bold" th:text="#{login-page.title}"></h4>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="login" name="username" placeholder="Nazwa użytkownika">
+                    <input type="text" class="form-control" id="login" name="username"
+                           th:placeholder="#{login-page.username}">
                     <label for="login"></label>
                 </div>
                 <div class="form-floating">
-                    <input type="password" name="password" class="form-control" id="password" placeholder="Hasło">
+                    <input type="password" name="password" class="form-control" id="password"
+                           th:placeholder="#{login-page.password}">
                     <label for="password"></label>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Zaloguj się</button>
+                <button type="submit" class="btn btn-primary btn-block" th:text="#{login-page.login}"></button>
                 <div class="form-footer">
-                    <p> Nie masz konta? <a th:href="@{/sign-up}">Zarejestruj się</a></p>
+                    <p><span th:text="#{login-page.question}"></span> <a th:href="@{/sign-up}"
+                                                                        th:text="#{login-page.register}"></a></p>
                 </div>
             </form>
         </section>
