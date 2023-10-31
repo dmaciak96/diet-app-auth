@@ -49,4 +49,9 @@ public class ApplicationUserServiceJpaImpl implements ApplicationUserService {
     public boolean existsByUsername(String username) {
         return applicationUserRepository.existsByUsername(username);
     }
+
+    @Override
+    public boolean existsByEmail(String username) {
+        return applicationUserRepository.existsByEmail(username);
+    }
 }

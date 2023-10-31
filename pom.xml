@@ -17,8 +17,7 @@
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.3</spring-cloud.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-        <bootstrap.version>5.3.2</bootstrap.version>
-        <jquery.version>3.7.1</jquery.version>
+        <commons-lang.version>3.13.0</commons-lang.version>
     </properties>
     <dependencies>
         <dependency>
@@ -64,6 +63,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

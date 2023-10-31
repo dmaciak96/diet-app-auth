@@ -6,4 +6,6 @@ public interface ApplicationUserService {
     ApplicationUser registerNewUser(ApplicationUser applicationUser);
 
     boolean existsByUsername(String username);
+
+    boolean existsByEmail(String username);
 }

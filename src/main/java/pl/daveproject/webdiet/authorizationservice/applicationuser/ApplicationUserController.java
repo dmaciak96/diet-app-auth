@@ -1,7 +1,11 @@
 package pl.daveproject.webdiet.authorizationservice.applicationuser;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +14,7 @@ import pl.daveproject.webdiet.authorizationservice.applicationuser.model.Applica
 import pl.daveproject.webdiet.authorizationservice.applicationuser.service.ApplicationUserMapper;
 import pl.daveproject.webdiet.authorizationservice.applicationuser.service.ApplicationUserService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping
@@ -18,7 +23,7 @@ public class ApplicationUserController {
     public static final String SIGN_UP_VIEW_NAME = "signup";
     public static final String LOGIN_URL = "/login";
     public static final String LOGIN_VIEW_NAME = "login";
-    public static final String APPLICATION_USER_MODEL_NAME = "application_user";
+    public static final String APPLICATION_USER_MODEL_NAME = "applicationUserSignUpRequest";
     public static final String LOGIN_ENDPOINT = "/login";
 
     private final ApplicationUserService applicationUserService;
@@ -40,13 +45,12 @@ public class ApplicationUserController {
     }
 
     @PostMapping(SIGN_UP_ENDPOINT)
-    public String registerUser(ApplicationUserSignUpRequest applicationUserSignUpRequest) {
-        /**
-         * Password min length 6
-         * 1 lowercase
-         * 1 uppercase
-         * 1 special character
-         */
+    public String registerUser(@Valid ApplicationUserSignUpRequest applicationUserSignUpRequest, BindingResult result) {
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(objectError ->
+                    log.error("{} - {}", objectError.getObjectName(), objectError.getDefaultMessage()));
+            return SIGN_UP_VIEW_NAME;
+        }
         var entity = mapper.toEntity(applicationUserSignUpRequest);
         applicationUserService.registerNewUser(entity);
         return "redirect:%s".formatted(LOGIN_ENDPOINT);
