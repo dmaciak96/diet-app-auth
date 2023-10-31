@@ -10,6 +10,12 @@ eureka:
 spring:
   application:
     name: webdiet-authorization-service
+  messages:
+    basename: lang/messages
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
   jpa:
     hibernate:
       ddl-auto: none

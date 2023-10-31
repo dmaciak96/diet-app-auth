@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Rejestracja</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<section class="container-fluid">
+    <section class="row justify-content-center">
+        <section class="col-12 col-sm-6 col-md-4">
+            <form class="form-container" th:action="@{/sign-up}" method="post" th:object="${application_user}">
+                <h4 class="text-center font-weight-bold">Rejestracja</h4>
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Adres e-mail">
+                    <label for="email"></label>
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="username" th:field="*{username}"
+                           placeholder="Nazwa użytkownika">
+                    <label for="username"></label>
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="first-name" th:field="*{firstName}" placeholder="Imię">
+                    <label for="first-name"></label>
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="last-name" th:field="*{lastName}"
+                           placeholder="Nazwisko">
+                    <label for="last-name"></label>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" id="password" th:field="*{password}"
+                           placeholder="Hasło">
+                    <label for="password"></label>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" id="confirm-password" th:field="*{confirmPassword}"
+                           placeholder="Powtórz hasło">
+                    <label for="confirm-password"></label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Zarejestruj się</button>
+                <div class="form-footer">
+                    <p> Posiadasz konto? <a th:href="@{/login}">Zaloguj się</a></p>
+                </div>
+            </form>
+        </section>
+    </section>
+</section>
+</body>
+</html>

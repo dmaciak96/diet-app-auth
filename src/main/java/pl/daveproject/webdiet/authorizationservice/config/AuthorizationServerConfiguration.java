@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,6 +28,8 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import pl.daveproject.webdiet.authorizationservice.applicationuser.ApplicationUserController;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -40,7 +43,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthorizationServerConfiguration {
 
-    private static final String LOGIN_URL = "/login";
+    private static final String LOGIN_PAGE = "/login.html";
     private static final String CLIENT_ID = "webdiet-client";
     private static final String CLIENT_SECRET = "{noop}webdiet-secret";
     private static final String REDIRECT_URI = "http://127.0.0.1:8080/login/oauth2/code/webdiet-client-oidc";
@@ -59,7 +62,7 @@ public class AuthorizationServerConfiguration {
         http
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint(LOGIN_URL),
+                                new LoginUrlAuthenticationEntryPoint(ApplicationUserController.LOGIN_URL),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 )
@@ -75,9 +78,11 @@ public class AuthorizationServerConfiguration {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers(ApplicationUserController.SIGN_UP_ENDPOINT).permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults());
+                .formLogin(config -> config.loginPage(ApplicationUserController.LOGIN_URL).permitAll());
 
         return http.build();
     }

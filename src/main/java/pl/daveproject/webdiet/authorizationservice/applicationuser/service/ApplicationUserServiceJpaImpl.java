@@ -33,8 +33,12 @@ public class ApplicationUserServiceJpaImpl implements ApplicationUserService {
                 .username(applicationUser.getUsername())
                 .applicationUser(applicationUser)
                 .build()));
-        applicationUser.setEnabled(true);
-        return applicationUserRepository.save(applicationUser);
+        if (applicationUser.getVersion() == null) {
+            applicationUser.setVersion(1);
+        }
+        var savedUser = applicationUserRepository.save(applicationUser);
+        log.info("Registered new user {}", savedUser.getUsername());
+        return savedUser;
     }
 
     private String encodePassword(String password) {

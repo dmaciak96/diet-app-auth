@@ -51,12 +51,6 @@ public class ApplicationUser {
 
     private boolean enabled;
 
-    @Transient
-    private String oldPassword;
-
-    @Transient
-    private String newPassword;
-
     @Version
     private Integer version;
 
