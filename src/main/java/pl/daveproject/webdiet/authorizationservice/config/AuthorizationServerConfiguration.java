@@ -14,6 +14,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -28,7 +29,6 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import pl.daveproject.webdiet.authorizationservice.applicationuser.ApplicationUserController;
 
 import java.security.KeyPair;
@@ -49,6 +49,7 @@ public class AuthorizationServerConfiguration {
     private static final String POST_LOGOUT_REDIRECT_URI = "http://127.0.0.1:8080/";
     private static final String ISSUSER_URI = "http://auth-server:8888";
     private static final String RSA_ALGORITHM_NAME = "RSA";
+    private static final String SESSION_ID_COOKIE = "JSESSIONID";
 
     private final UserDetailsService userDetailsService;
 
@@ -65,6 +66,10 @@ public class AuthorizationServerConfiguration {
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 )
+                .logout(logout ->
+                        logout.invalidateHttpSession(true)
+                                .clearAuthentication(true)
+                                .deleteCookies(SESSION_ID_COOKIE))
                 .oauth2ResourceServer((resourceServer) -> resourceServer
                         .jwt(Customizer.withDefaults()));
 
@@ -76,9 +81,11 @@ public class AuthorizationServerConfiguration {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(ApplicationUserController.SIGN_UP_ENDPOINT).permitAll()
+                        .requestMatchers("/logout**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(config -> config.loginPage(ApplicationUserController.LOGIN_URL).permitAll());
