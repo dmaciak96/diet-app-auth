@@ -43,7 +43,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthorizationServerConfiguration {
 
-    private static final String LOGIN_PAGE = "/login.html";
     private static final String CLIENT_ID = "webdiet-client";
     private static final String CLIENT_SECRET = "{noop}webdiet-secret";
     private static final String REDIRECT_URI = "http://127.0.0.1:8080/login/oauth2/code/webdiet-client-oidc";
